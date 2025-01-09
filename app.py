@@ -1,48 +1,57 @@
 from cs50 import SQL
-from flask import Flask, redirect, render_template, request, session
+from flask import (
+    Flask,
+    flash,
+    render_template,
+    request,
+)
+
 from flask_session import Session
-from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
 db = SQL("sqlite:///database.db")
 
-# @app.after_request
-# def after_request(response):
-#     """Ensure responses aren't cached"""
-#     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-#     response.headers["Expires"] = 0
-#     response.headers["Pragma"] = "no-cache"
-#     return response
 
-
+# TODO: Execute once before server start
 def create_movies_database(db: SQL):
     db.execute("""
     CREATE TABLE IF NOT EXISTS movies (
-        id           INT  PRIMARY KEY AUTO_INCREMENT,
-        title        TEXT NOT NULL,
-        genre        TEXT NOT NULL,
-        mood         TEXT NOT NULL,
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        title        TEXT    NOT NULL,
+        genre        TEXT    NOT NULL,
+        mood         TEXT    NOT NULL,
         description  TEXT,
-        release_year INT,
+        release_year INTEGER,
         rating       REAL
     );
     """)
 
 
-@app.route("/movie/<int:id>", methods=["GET"])
-def movie():
-    create_movies_database(db)
+@app.route("/movies/", methods=["GET", "POST"])
+def movies():
+    if request.method == "GET":
+        return render_template("movies.html")
 
-    raise NotImplemented
+    title = request.form.get("title")
+
+    if not title:
+        return render_template("movies.html")
 
     movies = db.execute(
         """
         SELECT *
-          FROM movies        
+          FROM movies
+         WHERE title LIKE ?;
         """,
+        "%" + title + "%",
     )
+
+    if not movies:
+        flash("Movie not found", "error")
+        return render_template("movies.html")
+
+    return render_template("movies.html", movies=movies)

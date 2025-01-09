@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(True) %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li {% if message.0 == "error" %}style="color: red"{% endif %}>
+                        {{ message.1 }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% block body %}
+    {% endblock %}
+</body>
+
+</html>
