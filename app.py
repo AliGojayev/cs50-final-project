@@ -2,9 +2,16 @@ from cs50 import SQL
 from flask import (
     Flask,
     flash,
+<<<<<<< HEAD
+=======
+    redirect,
+>>>>>>> be070cd8de96a4e5fa03b9c4217b7b365f899416
     render_template,
     request,
+    session,
+    redirect
 )
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_session import Session
 
@@ -30,8 +37,27 @@ def create_movies_database(db: SQL):
     );
     """)
 
+    def create_users_database(db: SQL):
+        db.execute("""
+     CREATE TABLE IF NOT EXISTS users (
+    user_id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    username        TEXT NOT NULL UNIQUE,            
+    hashed_password TEXT NOT NULL,           
+    watched_films   TEXT DEFAULT NULL          
+);
+""")
+        
+
+@app.route("/")
+@login_required
+def index():
+    #TODO:
+
+    return
+
 
 @app.route("/movies/", methods=["GET", "POST"])
+@login_required
 def movies():
     if request.method == "GET":
         return render_template("movies.html")
@@ -55,3 +81,78 @@ def movies():
         return render_template("movies.html")
 
     return render_template("movies.html", movies=movies)
+
+
+@app.route("/register", methods = ["GET","POST"])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
+
+    if request.method == "POST":
+        if not request.form.get("username"):
+            flash("Must provide username", "error")
+            return redirect("/register")
+        elif not request.form.get("password"):
+            flash("Must provide password", "error")
+            return redirect("/register")
+        elif not request.form.get("confirmation"):
+            flash("Must verify your password", "error")
+            return redirect("/register")
+        if request.form.get("password") != request.form.get("confirmation"):
+            flash("Passwords must be identical", "error")
+            return redirect("/register")
+
+        usernames = db.execute("SELECT username FROM users")
+        for user in usernames:
+            if request.form.get("username") == user["username"]:
+                flash("Username already taken, choose another one", "error")
+                return redirect("/register")
+
+        hash = generate_password_hash(request.form.get("password"))
+        username = request.form.get("username")
+        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash)
+
+        rows = db.execute("SELECT id FROM users WHERE username = ?", username)
+        session["user_id"] = rows[0]["id"]
+
+        return redirect("/")
+    
+@app.route("/login", methods = ["GET","POST"])
+def login():
+    session.clear()
+
+    if request.method == "GET":
+        return render_template("login.html")
+
+
+    if request.method == "POST":
+
+        if not request.form.get("username"):
+            flash("Must provide username", "error")
+            return redirect("/login")
+
+        elif not request.form.get("password"):
+            flash("Must provide password", "error")
+            return redirect("/login")
+
+        rows = db.execute(
+            "SELECT * FROM users WHERE username = ?", request.form.get("username")
+        )
+
+        if len(rows) != 1 or not check_password_hash(
+            rows[0]["hash"], request.form.get("password")
+        ):
+            flash("Invalid username and/or password", "error")
+            return redirect("/login")
+
+        session["user_id"] = rows[0]["id"]
+
+        return redirect("/")
+    
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/")
