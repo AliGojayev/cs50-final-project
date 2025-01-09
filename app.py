@@ -55,3 +55,25 @@ def movies():
         return render_template("movies.html")
 
     return render_template("movies.html", movies=movies)
+
+
+@app.route("/movie/<int:movie_id>", methods=["GET"])
+def movie(movie_id):
+    try:
+        movie = db.execute(
+            """
+            SELECT *
+              FROM movies
+             WHERE id = ?;
+            """,
+            movie_id,
+        )[0]
+    except IndexError:
+        flash("Movie with specified ID was not found", "error")
+        return redirect("/movies")
+
+    if movie:
+        return render_template("movie.html", movie=movie)
+    else:
+        flash("Movie with specified ID was not found", "error")
+        return redirect("/movies")
