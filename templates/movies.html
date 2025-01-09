@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Movies
+{% endblock %}
+
+{% block body %}
+    <form action="/movies" method="post">
+        <input name="title" placeholder="Movie title" type="text">
+        <button type="submit">Search by title</button>
+    </form>
+
+    {% if movies %}
+        {% for movie in movies %}
+            <table>
+                <tbody>
+                    <td>{{ movie.title }}</td>
+                    <td>{{ movie.genre }}</td>
+                    <td>{{ movie.mood }}</td>
+                    <td>{{ movie.release_year }}</td>
+                    <td>{{ movie.rating }}</td>
+                </tbody>
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
