@@ -103,27 +103,42 @@ def register():
         return render_template("register.html")
 
     if request.method == "POST":
-        if not request.form.get("username"):
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+
+        if not username:
             flash("Must provide username", "error")
             return redirect("/register")
-        elif not request.form.get("password"):
+        elif not password:
             flash("Must provide password", "error")
             return redirect("/register")
-        elif not request.form.get("confirmation"):
+        elif not confirmation:
             flash("Must verify your password", "error")
             return redirect("/register")
+
+        # Strip trailing and leading whitespace from credentials
+        username = username.strip()
+        password = password.strip()
+        confirmation = confirmation.strip()
+
+        # If username and password are empty after strip, they were full whitespace
+        if not (username and password):
+            flash("Blank data in username and password are not allowed", "error")
+            return redirect("/register")
+
         if request.form.get("password") != request.form.get("confirmation"):
             flash("Passwords must be identical", "error")
             return redirect("/register")
 
-        usernames = db.execute("SELECT username FROM users")
-        for user in usernames:
-            if request.form.get("username") == user["username"]:
-                flash("Username already taken, choose another one", "error")
-                return redirect("/register")
+        registered_with_same_name = db.execute(
+            "SELECT username FROM users WHERE username = ?", username
+        )
+        if registered_with_same_name:
+            flash("Username already taken, choose another one", "error")
+            return redirect("/register")
 
-        hash = generate_password_hash(request.form.get("password"))
-        username = request.form.get("username")
+        hash = generate_password_hash(password)
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash)
 
         rows = db.execute("SELECT id FROM users WHERE username = ?", username)
@@ -134,26 +149,33 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "GET":
         return render_template("login.html")
 
     if request.method == "POST":
-        if not request.form.get("username"):
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if not username:
             flash("Must provide username", "error")
             return redirect("/login")
 
-        elif not request.form.get("password"):
+        elif not password:
             flash("Must provide password", "error")
             return redirect("/login")
 
-        rows = db.execute(
-            "SELECT * FROM users WHERE username = ?", request.form.get("username")
-        )
+        # Strip trailing and leading whitespace from credentials
+        username = username.strip()
+        password = password.strip()
 
-        if len(rows) != 1 or not check_password_hash(
-            rows[0]["hash"], request.form.get("password")
-        ):
+        # If username and password are empty after strip, they were full whitespace
+        if not (username and password):
+            flash("Blank data in username and password are not allowed", "error")
+            return redirect("/register")
+
+        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
+
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
             flash("Invalid username and/or password", "error")
             return redirect("/login")
 
