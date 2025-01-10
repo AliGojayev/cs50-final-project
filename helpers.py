@@ -20,6 +20,13 @@ def login_required(f):
     return decorated_function
 
 
+def snake_to_sentence_case(text):
+    """Convert snake case string to sentence case"""
+    sentence = text.replace("_", " ").capitalize()
+
+    return sentence
+
+
 # TODO: Execute once before server start
 def create_movies_database(db: SQL):
     db.execute("""

@@ -12,7 +12,15 @@
                     <div class="card-body">
                         <h2 class="text-center mb-4">Search Movies</h2>
                         <form action="/movies" method="post" class="d-flex justify-content-center mb-4">
-                            <input class="form-control w-75" name="title" placeholder="Movie title" type="text">
+                            <input class="form-control w-75" name="search-query" placeholder="Query" type="text">
+                            <select class="form-select mx-auto w-auto" name="search-criteria">
+                                <option disabled="" selected="">Criteria</option>
+                                {% for criteria in criterias %}
+                                    <option value={{ criteria }} {% if criteria == "title" %} selected="selected" {% endif %}>
+                                        {{ criteria | snake_to_sentence_case }}
+                                    </option>
+                                {% endfor %}
+                            </select>
                             <button class="btn btn-warning ms-2" type="submit">Search</button>
                         </form>
 

@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_session import Session
-from helpers import login_required
+from helpers import login_required, snake_to_sentence_case
 
 app = Flask(__name__)
 
@@ -11,6 +11,9 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 db = SQL("sqlite:///database.db")
+
+# Filter to change snake case of the database column name to sentence case
+app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case
 
 
 @app.route("/")
@@ -21,30 +24,44 @@ def index():
 
 @app.route("/movies/", methods=["GET", "POST"])
 def movies():
+    criterias = [
+        column["name"]
+        for column in db.execute("SELECT name FROM pragma_table_info('movies');")
+    ]
+
     if request.method == "GET":
-        return render_template("movies.html")
+        return render_template("movies.html", criterias=criterias)
 
     if request.method == "POST":
-        title = request.form.get("title")
+        search_criteria = request.form.get("search-criteria")
+        search_query = request.form.get("search-query")
 
-        if not title:
-            flash("Must provide the title of the movie", "error")
-            return render_template("movies.html")
+        if not search_criteria:
+            flash("Must provide movie search criteria", "error")
+            return render_template("movies.html", criterias=criterias)
+
+        if not search_query:
+            flash(f"Must provide the {search_criteria} of the movie", "error")
+            return render_template("movies.html", criterias=criterias)
+
+        if search_criteria not in criterias:
+            flash("Provided search criteria is not correct", "error")
+            return render_template("movies.html", criterias=criterias)
 
         movies = db.execute(
-            """
+            f"""
             SELECT *
-            FROM movies
-            WHERE title LIKE ?;
-            """,
-            "%" + title + "%",
+              FROM movies
+             WHERE {search_criteria} LIKE ?;
+            """,  # SQL Injection is not possible as `search_criteria` variable is checked beforehand
+            "%" + search_query + "%",
         )
 
         if not movies:
             flash("Movie not found", "error")
-            return render_template("movies.html")
+            return render_template("movies.html", criterias=criterias)
 
-        return render_template("movies.html", movies=movies)
+        return render_template("movies.html", criterias=criterias, movies=movies)
 
 
 @app.route("/movie/<int:movie_id>", methods=["GET"])
