@@ -40,37 +40,38 @@ def create_users_database(db: SQL):
 
 
 @app.route("/")
-@login_required
 def index():
     # TODO:
 
-    return
+    return redirect("/register")
 
 
 @app.route("/movies/", methods=["GET", "POST"])
 def movies():
     if request.method == "GET":
         return render_template("movies.html")
+    
+    if request.method == "POST":
+        title = request.form.get("title")
 
-    title = request.form.get("title")
+        if not title:
+            flash("Must provide the title of the movie", "error")
+            return render_template("movies.html")
 
-    if not title:
-        return render_template("movies.html")
+        movies = db.execute(
+            """
+            SELECT *
+            FROM movies
+            WHERE title LIKE ?;
+            """,
+            "%" + title + "%",
+        )
 
-    movies = db.execute(
-        """
-        SELECT *
-          FROM movies
-         WHERE title LIKE ?;
-        """,
-        "%" + title + "%",
-    )
+        if not movies:
+            flash("Movie not found", "error")
+            return render_template("movies.html")
 
-    if not movies:
-        flash("Movie not found", "error")
-        return render_template("movies.html")
-
-    return render_template("movies.html", movies=movies)
+        return render_template("movies.html", movies=movies)
 
 
 @app.route("/movie/<int:movie_id>", methods=["GET"])
@@ -133,7 +134,6 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    session.clear()
 
     if request.method == "GET":
         return render_template("login.html")
