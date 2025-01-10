@@ -41,16 +41,15 @@ def create_users_database(db: SQL):
 
 @app.route("/")
 def index():
-    # TODO:
-
-    return redirect("/register")
+    # TODO: Create separate index page
+    return redirect("/movies")
 
 
 @app.route("/movies/", methods=["GET", "POST"])
 def movies():
     if request.method == "GET":
         return render_template("movies.html")
-    
+
     if request.method == "POST":
         title = request.form.get("title")
 
