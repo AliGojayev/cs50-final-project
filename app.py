@@ -1,16 +1,29 @@
+from os import path
+
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_session import Session
-from helpers import get_table_columns, login_required, snake_to_sentence_case
+from helpers import (
+    get_table_columns,
+    login_required,
+    setup_database,
+    snake_to_sentence_case,
+)
 
 app = Flask(__name__)
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-db = SQL("sqlite:///database.db")
+
+DATABASE_PATH = "database.db"
+
+if not path.exists(DATABASE_PATH):
+    setup_database(DATABASE_PATH)
+
+db = SQL(f"sqlite:///{DATABASE_PATH}")
 
 # Filter to change snake case of the database column name to sentence case
 app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case

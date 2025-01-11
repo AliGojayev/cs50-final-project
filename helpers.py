@@ -1,4 +1,5 @@
 from functools import wraps
+from sqlite3 import Connection, connect
 
 from cs50 import SQL
 from flask import redirect, session
@@ -35,8 +36,7 @@ def get_table_columns(db: SQL, table: str) -> list[str]:
     ]
 
 
-# TODO: Execute once before server start
-def create_movies_database(db: SQL):
+def create_movies_database(db: SQL | Connection):
     db.execute("""
     CREATE TABLE IF NOT EXISTS movies (
         id           INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,12 +50,36 @@ def create_movies_database(db: SQL):
     """)
 
 
-def create_users_database(db: SQL):
+def create_users_database(db: SQL | Connection):
     db.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        user_id         INTEGER PRIMARY KEY AUTOINCREMENT,
-        username        TEXT    NOT NULL UNIQUE,
-        hashed_password TEXT    NOT NULL,
-        watched_films   TEXT    DEFAULT NULL
+        id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT    NOT NULL UNIQUE,
+        hash     TEXT    NOT NULL
     );
     """)
+
+
+def create_watched_movies_database(db: SQL | Connection):
+    db.execute("""
+    CREATE TABLE IF NOT EXISTS watched_movies (
+        user_id  INTEGER NOT NULL,
+        movie_id INTEGER NOT NULL,
+        rating   REAL,
+
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (movie_id) REFERENCES movies(id)
+    );
+    """)
+
+
+def setup_database(database_path: str) -> None:
+    temp_db = connect(database_path)
+
+    create_users_database(temp_db)
+    create_movies_database(temp_db)
+    create_watched_movies_database(temp_db)
+
+    temp_db.commit()
+
+    del temp_db
