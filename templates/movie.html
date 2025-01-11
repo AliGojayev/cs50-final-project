@@ -18,6 +18,7 @@
                                 <th>Mood</th>
                                 <th>Year</th>
                                 <th>Rating</th>
+                                <th>Movie description</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -26,6 +27,7 @@
                                 <td>{{ movie.mood }}</td>
                                 <td>{{ movie.release_year }}</td>
                                 <td>{% if movie.rating %}{{ movie.rating }}{% else %}N/A{% endif %}</td>
+                                <td>{{ movie.description }}</td>
                             </tr>
                         </tbody>
                     </table>
