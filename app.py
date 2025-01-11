@@ -107,15 +107,13 @@ def movie(movie_id):
     # Try to find the value of the user rating
     user_rating = db.execute(
         "SELECT rating FROM watched_movies WHERE user_id = ? AND movie_id = ?;",
-        movie["id"],
         user_id,
+        movie["id"],
     )
 
     # If user rating was found, unwrap it from the list and dictionary
     if user_rating:
         user_rating = user_rating[0]["rating"]
-
-    print(f"{user_id=}")
 
     return render_template("movie.html", movie=movie, user_rating=user_rating)
 
