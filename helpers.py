@@ -27,6 +27,14 @@ def snake_to_sentence_case(text):
     return sentence
 
 
+def get_table_columns(db: SQL, table: str) -> list[str]:
+    """Returns list of names of columns that are available in the table."""
+    return [
+        column["name"]
+        for column in db.execute("SELECT name FROM pragma_table_info(?);", table)
+    ]
+
+
 # TODO: Execute once before server start
 def create_movies_database(db: SQL):
     db.execute("""

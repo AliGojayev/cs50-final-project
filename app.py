@@ -3,7 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_session import Session
-from helpers import login_required, snake_to_sentence_case
+from helpers import get_table_columns, login_required, snake_to_sentence_case
 
 app = Flask(__name__)
 
@@ -24,10 +24,7 @@ def index():
 
 @app.route("/movies/", methods=["GET", "POST"])
 def movies():
-    criterias = [
-        column["name"]
-        for column in db.execute("SELECT name FROM pragma_table_info('movies');")
-    ]
+    criterias = get_table_columns(db, "movies")
 
     if request.method == "GET":
         return render_template("movies.html", criterias=criterias)
