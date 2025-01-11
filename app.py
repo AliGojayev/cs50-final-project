@@ -20,6 +20,7 @@ Session(app)
 
 DATABASE_PATH = "database.db"
 
+# If database file is not created, create it and necessary tables using sqlite
 if not path.exists(DATABASE_PATH):
     setup_database(DATABASE_PATH)
 
@@ -30,9 +31,21 @@ app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case
 
 
 @app.route("/")
+@login_required
 def index():
-    # TODO: Create separate index page
-    return redirect("/movies")
+    user_id = session["user_id"]
+
+    watched_movies = db.execute(
+        """
+        SELECT m.id, m.title, wm.rating
+          FROM movies m
+          JOIN watched_movies wm ON m.id = wm.movie_id
+         WHERE wm.user_id = ?;
+        """,
+        user_id,
+    )
+
+    return render_template("index.html", watched_movies=watched_movies)
 
 
 @app.route("/movies/", methods=["GET", "POST"])
@@ -79,22 +92,32 @@ def movie(movie_id):
     # Find movie with provided ID
     try:
         movie = db.execute(
-            """
-            SELECT *
-              FROM movies
-             WHERE id = ?;
-            """,
+            "SELECT * FROM movies WHERE id = ?;",
             movie_id,
         )[0]
     except IndexError:
         flash("Movie with specified ID was not found", "error")
         return redirect("/movies")
 
-    if movie:
-        return render_template("movie.html", movie=movie)
-    else:
+    if not movie:
         flash("Movie with specified ID was not found", "error")
         return redirect("/movies")
+
+    user_id = session.get("user_id")
+    # Try to find the value of the user rating
+    user_rating = db.execute(
+        "SELECT rating FROM watched_movies WHERE user_id = ? AND movie_id = ?;",
+        movie["id"],
+        user_id,
+    )
+
+    # If user rating was found, unwrap it from the list and dictionary
+    if user_rating:
+        user_rating = user_rating[0]["rating"]
+
+    print(f"{user_id=}")
+
+    return render_template("movie.html", movie=movie, user_rating=user_rating)
 
 
 @app.route("/register", methods=["GET", "POST"])

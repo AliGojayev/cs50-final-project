@@ -10,7 +10,7 @@
             <div class="card shadow-lg border-0 rounded-3">
                 <div class="card-body">
                     <h2 class="text-center mb-4 text-dark">{{ movie.title }}</h2>
-                    
+
                     <table class="table table-dark table-striped">
                         <thead>
                             <tr>
@@ -31,6 +31,12 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    {% if user_rating %}
+                        <div class="text-center mt-4">
+                            Your rating of the movie: {{ user_rating }}
+                        </div>
+                    {% endif %}
 
                     <div class="text-center mt-4">
                         <a href="/movies" class="btn btn-warning">Back to Movies</a>

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block body %}
+    <h2>Watched movies</h2>
+
+    <ul>
+    {% for movie in watched_movies %}
+        <li><a href="/movie/{{ movie.id }}">{{ movie.title }}{% if movie.rating %}</a> | ★{{ movie.rating }}{% endif %}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
