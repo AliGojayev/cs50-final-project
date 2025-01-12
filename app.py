@@ -276,3 +276,72 @@ def logout():
     session.clear()
 
     return redirect("/")
+
+
+@app.route("/add-movie", methods=["GET", "POST"])
+def add_movie():
+    if request.method == "GET":
+        return render_template("add_movie.html")
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        year = request.form.get("year")
+        genre = request.form.get("genre")
+        rating = request.form.get("rating")
+        mood = request.form.get("mood")
+        description = request.form.get("description")
+
+        if not title:
+            flash("Must provide movie title", "error")
+            return redirect("/add_movie")
+
+        if not year:
+            flash("Must provide movie year", "error")
+            return redirect("/add_movie")
+        
+        if not mood:
+            flash("Must provide movie mood", "error")
+            return redirect("/add_movie")
+        
+        if not description:
+            flash("Must provide movie description", "error")
+            return redirect("/add_movie")
+        
+        if not genre:
+            flash("Must provide movie genre", "error")
+            return redirect("/add_movie")
+
+        if not rating:
+            flash("Must provide movie rating", "error")
+            return redirect("/add_movie")
+
+        try:
+            year = int(year)
+        except ValueError:
+            flash("Year must be a number", "error")
+            return redirect("/add_movie")
+
+        try:
+            rating = int(rating)
+            if not 1 <= rating <= 10:
+                flash("Rating must be between 1 and 10", "error")
+                return redirect("/add_movie")
+        except ValueError:
+            flash("Rating must be a number", "error")
+            return redirect("/add_movie")
+
+        db.execute(
+            """
+            INSERT INTO movies (title, year, mood, genre, rating)
+            VALUES (?, ?, ?, ?, ?);
+            """,
+            title,
+            year,
+            mood,
+            genre,
+            rating,
+        )
+
+        flash("Movie added successfully", "success")
+
+        return redirect("/add_movie")
