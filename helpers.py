@@ -43,6 +43,7 @@ def create_movies_database(db: SQL | Connection):
         title        TEXT    NOT NULL,
         genre        TEXT    NOT NULL,
         mood         TEXT    NOT NULL,
+        image_path   TEXT    NOT NULL DEFAULT '_not-found.jpg',
         description  TEXT,
         release_year INTEGER,
         rating       REAL
