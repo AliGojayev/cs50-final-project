@@ -62,11 +62,12 @@ def create_users_database(db: SQL | Connection):
 
 def create_watched_movies_database(db: SQL | Connection):
     db.execute("""
-    CREATE TABLE IF NOT EXISTS watched_movies (
+    CREATE TABLE watched_movies (
         user_id  INTEGER NOT NULL,
         movie_id INTEGER NOT NULL,
         rating   REAL,
 
+        PRIMARY KEY (user_id, movie_id),
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (movie_id) REFERENCES movies(id)
     );
