@@ -30,22 +30,77 @@ db = SQL(f"sqlite:///{DATABASE_PATH}")
 app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case
 
 
-@app.route("/")
+
+@app.route("/", methods=["GET"])
 @login_required
 def index():
     user_id = session["user_id"]
 
-    watched_movies = db.execute(
-        """
+    all_movies = db.execute("SELECT id, title FROM movies;")
+    watched_movies = db.execute("""
         SELECT m.id, m.title, wm.rating
-          FROM movies m
-          JOIN watched_movies wm ON m.id = wm.movie_id
-         WHERE wm.user_id = ?;
-        """,
-        user_id,
+        FROM movies m
+        JOIN watched_movies wm ON m.id = wm.movie_id
+        WHERE wm.user_id = ?;
+    """, user_id)
+
+    watched_movie_ids = {movie['id'] for movie in watched_movies}
+
+    return render_template(
+        "index.html", 
+        all_movies=all_movies, 
+        watched_movies=watched_movies, 
+        watched_movie_ids=watched_movie_ids
     )
 
-    return render_template("index.html", watched_movies=watched_movies)
+@app.route("/mark-watched", methods=["POST"])
+@login_required
+def mark_watched():
+    user_id = session["user_id"]
+    movie_id = request.form.get("movie_id")
+
+    if movie_id:
+        try:
+            db.execute("""
+                INSERT INTO watched_movies (user_id, movie_id)
+                VALUES (?, ?)
+                ON CONFLICT (user_id, movie_id) DO NOTHING;
+            """, user_id, movie_id)
+            flash("Movie marked as watched", "success")
+        except Exception as e:
+            flash("Error marking movie as watched", "error")
+            print(e)
+
+    return redirect("/")
+
+@app.route("/rate-movie", methods=["POST"])
+@login_required
+def rate_movie():
+    user_id = session["user_id"]
+    movie_id = request.form.get("movie_id")
+    rating = request.form.get("rating")
+
+    if movie_id and rating:
+        try:
+            rating = int(rating)
+            if 1 <= rating <= 10:
+                db.execute("""
+                    UPDATE watched_movies
+                    SET rating = ?
+                    WHERE user_id = ? AND movie_id = ?;
+                """, rating, user_id, movie_id)
+                flash(f"Movie rated successfully with ★{rating}!", "success")
+            else:
+                flash("Rating must be between 1 and 10", "error")
+        except ValueError:
+            flash("Invalid rating", "error")
+        except Exception as e:
+            flash("Error rating movie", "error")
+            print(e)
+
+    return redirect("/")
+
+
 
 
 @app.route("/movies/", methods=["GET", "POST"])
