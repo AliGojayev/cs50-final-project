@@ -56,6 +56,24 @@ def index():
     )
 
 
+@app.route("/watched", methods=["GET"])
+@login_required
+def watched_movies():
+    user_id = session["user_id"]
+
+    watched_movies = db.execute(
+        """
+        SELECT m.id, m.title, wm.rating
+          FROM movies m
+          JOIN watched_movies wm ON m.id = wm.movie_id
+         WHERE wm.user_id = ?;
+        """,
+        user_id,
+    )
+
+    return render_template("watched-movies.html", watched_movies=watched_movies)
+
+
 @app.route("/mark-watched", methods=["POST"])
 @login_required
 def mark_watched():
@@ -79,6 +97,27 @@ def mark_watched():
             print(e)
 
     return redirect("/")
+
+
+@app.route("/mark-unwatched", methods=["POST"])
+@login_required
+def mark_unwatched():
+    user_id = session["user_id"]
+    movie_id = request.form.get("movie_id")
+
+    if movie_id:
+        try:
+            db.execute(
+                "DELETE FROM watched_movies WHERE user_id = ? AND movie_id = ?;",
+                user_id,
+                movie_id,
+            )
+            flash("Movie marked as unwatched", "success")
+        except Exception as e:
+            flash("Error marking movie as watched", "error")
+            print(e)
+
+    return redirect("/watched")
 
 
 @app.route("/rate-movie", methods=["POST"])
@@ -305,15 +344,15 @@ def add_movie():
         if not year:
             flash("Must provide movie year", "error")
             return redirect("/add_movie")
-        
+
         if not mood:
             flash("Must provide movie mood", "error")
             return redirect("/add_movie")
-        
+
         if not description:
             flash("Must provide movie description", "error")
             return redirect("/add_movie")
-        
+
         if not genre:
             flash("Must provide movie genre", "error")
             return redirect("/add_movie")

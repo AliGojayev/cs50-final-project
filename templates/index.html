@@ -25,35 +25,6 @@
             </li>
         {% endfor %}
     </ul>
-
-    <h2 class="mt-5 mb-4">Watched Movies</h2>
-    <ul class="list-group">
-        {% for movie in watched_movies %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }}</a>
-                    {% if movie.rating %}
-                        <span class="badge ms-2
-                            {% if movie.rating <= 5 %}bg-danger{% else %}bg-success{% endif %}">
-                            ★{{ movie.rating }}
-                        </span>
-                    {% else %}
-                        <span class="badge bg-secondary ms-2">Not rated yet</span>
-                    {% endif %}
-                </div>
-                <form method="POST" action="/rate-movie" class="d-inline">
-                    <input type="hidden" name="movie_id" value="{{ movie.id }}">
-                    <select name="rating" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
-                        <option value="" selected disabled>Rate</option>
-                        <option value="remove-rating">Remove</option>
-                        {% for rating in range(1, 11) %}
-                            <option value="{{ rating }}">★{{ rating }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
 </div>
 
 {% endblock %}
