@@ -30,28 +30,50 @@ db = SQL(f"sqlite:///{DATABASE_PATH}")
 app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
+    criterias = get_table_columns(db, "movies")
+
+    if request.method == "POST":
+        sort_criteria = request.form.get("sort-criteria")
+        sort_order = request.form.get("sort-order")
+
+        if sort_criteria not in criterias:
+            flash("Invalid sort criteria", "error")
+            return redirect("/")
+
+        if sort_order not in ("ASC", "DESC"):
+            flash("Invalid sort order", "error")
+            sort_order = "ASC"
+    else:
+        sort_criteria = "title"
+        sort_order = "ASC"
+
     user_id = session["user_id"]
 
-    all_movies = db.execute("SELECT id, title FROM movies;")
-    watched_movies = db.execute(
-        """
-        SELECT m.id, m.title, wm.rating
-          FROM movies m
-          JOIN watched_movies wm ON m.id = wm.movie_id
-         WHERE wm.user_id = ?;
-        """,
-        user_id,
+    all_movies = db.execute(
+        f"SELECT id, title FROM movies ORDER BY {sort_criteria} {sort_order};"
     )
 
-    watched_movie_ids = {movie["id"] for movie in watched_movies}
+    # TODO: Optimize query
+    watched_movie_ids = [
+        movie["id"]
+        for movie in db.execute(
+            """
+            SELECT m.id
+              FROM movies m
+              JOIN watched_movies wm ON m.id = wm.movie_id
+             WHERE wm.user_id = ?
+            """,
+            user_id,
+        )
+    ]
 
     return render_template(
         "index.html",
+        criterias=criterias,
         all_movies=all_movies,
-        watched_movies=watched_movies,
         watched_movie_ids=watched_movie_ids,
     )
 
