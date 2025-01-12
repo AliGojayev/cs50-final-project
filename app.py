@@ -90,8 +90,12 @@ def rate_movie():
 
     if movie_id and rating:
         try:
-            rating = int(rating)
-            if 1 <= rating <= 10:
+            if rating == "remove-rating":
+                rating = None
+            else:
+                rating = int(rating)
+
+            if not rating or (1 <= rating <= 10):
                 db.execute(
                     """
                     UPDATE watched_movies
@@ -102,7 +106,10 @@ def rate_movie():
                     user_id,
                     movie_id,
                 )
-                flash(f"Movie rated successfully with ★{rating}!", "success")
+                if rating:
+                    flash(f"Movie rated successfully with ★{rating}!", "success")
+                else:
+                    flash("Successfully removed rating from the movie!", "success")
             else:
                 flash("Rating must be between 1 and 10", "error")
         except ValueError:
