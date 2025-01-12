@@ -285,7 +285,7 @@ def logout():
     return redirect("/")
 
 
-@app.route("/add-movie", methods=["GET", "POST"])
+@app.route("/add_movie", methods=["GET", "POST"])
 def add_movie():
     if request.method == "GET":
         return render_template("add_movie.html")
@@ -339,7 +339,7 @@ def add_movie():
 
         db.execute(
             """
-            INSERT INTO movies (title, year, mood, genre, rating)
+            INSERT INTO movies (title, release_year, mood, genre, rating)
             VALUES (?, ?, ?, ?, ?);
             """,
             title,
@@ -347,6 +347,7 @@ def add_movie():
             mood,
             genre,
             rating,
+            description,
         )
 
         flash("Movie added successfully", "success")

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Movie{% endblock %}
+
+{% block body %}
+
+<style>
+    .btn-yellow {
+        background-color: #f5c518;
+        border-color: #f5c518;
+        color: #1a1a1a;
+    }
+
+    .btn-yellow:hover {
+        background-color: #d4a017; 
+        border-color: #d4a017;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Add a New Movie</h2>
+    <form action="/add_movie" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="title" class="form-label">Movie Title</label>
+            <input type="text" class="form-control" id="title" name="title">
+            <div class="invalid-feedback">Please provide a movie title.</div>
+        </div>
+        <div class="mb-3">
+            <label for="year" class="form-label">Release Year</label>
+            <input type="number" class="form-control" id="year" name="year">
+            <div class="invalid-feedback">Please provide a valid year.</div>
+        </div>
+        <div class="mb-3">
+            <label for="genre" class="form-label">Genre</label>
+            <input type="text" class="form-control" id="genre" name="genre">
+            <div class="invalid-feedback">Please provide a genre.</div>
+        </div>
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating (1-10)</label>
+            <input type="number" class="form-control" id="rating" name="rating" min="1" max="10">
+            <div class="invalid-feedback">Please provide a rating between 1 and 10.</div>
+        </div>
+        <div class="mb-3">
+            <label for="mood" class="form-label">Mood</label>
+            <input type="text" class="form-control" id="mood" name="mood">
+            <div class="invalid-feedback">Please provide the mood of the movie.</div>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5"></textarea>
+            <div class="invalid-feedback">Please provide a description for the movie.</div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-yellow">Add Movie</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
