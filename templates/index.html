@@ -41,10 +41,14 @@
                         <span class="badge bg-secondary ms-2">Not rated yet</span>
                     {% endif %}
                 </div>
+                <form method="POST" action="/mark-unwatched" class="d-inline">
+                    <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                    <button type="submit" class="btn btn-sm btn-secondary">Mark as Unwatched</button>
+                </form>
                 <form method="POST" action="/rate-movie" class="d-inline">
                     <input type="hidden" name="movie_id" value="{{ movie.id }}">
                     <select name="rating" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
-                        <option value="" selected disabled>Rate</option>
+                        <option value="" selected dsabled>Rate</option>
                         <option value="remove-rating">Remove</option>
                         {% for rating in range(1, 11) %}
                             <option value="{{ rating }}">★{{ rating }}</option>
