@@ -402,8 +402,8 @@ def add_movie():
 
         db.execute(
             """
-            INSERT INTO movies (title, release_year, mood, genre, rating)
-            VALUES (?, ?, ?, ?, ?);
+            INSERT INTO movies (title, release_year, mood, genre, rating, description)
+            VALUES (?, ?, ?, ?, ?,?);
             """,
             title,
             year,
@@ -415,4 +415,4 @@ def add_movie():
 
         flash("Movie added successfully", "success")
 
-        return redirect("/add_movie")
+        return redirect("/")
