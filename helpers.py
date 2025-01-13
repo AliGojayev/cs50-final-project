@@ -28,12 +28,25 @@ def snake_to_sentence_case(text):
     return sentence
 
 
-def get_table_columns(db: SQL, table: str) -> list[str]:
-    """Returns list of names of columns that are available in the table."""
-    return [
+def get_table_columns(
+    db: SQL, table: str, excluded_columns: list[str] = []
+) -> list[str]:
+    """
+    Returns list of names of columns that are available in the table,
+    excluding specified column names (if provided).
+    """
+    all_columns = [
         column["name"]
         for column in db.execute("SELECT name FROM pragma_table_info(?);", table)
     ]
+
+    columns = []
+
+    for column in all_columns:
+        if column not in excluded_columns:
+            columns.append(column)
+
+    return columns
 
 
 def create_movies_database(db: SQL | Connection):

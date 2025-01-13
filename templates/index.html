@@ -13,7 +13,11 @@
             <option disabled="" selected="">Criteria</option>
             {% for criteria in criterias %}
                 <option value={{ criteria }} {% if criteria == "title" %} selected="selected" {% endif %}>
-                    {{ criteria | snake_to_sentence_case }}
+                    {% if criteria == "title" %}
+                        Alphabetically
+                    {% else %}
+                        {{ criteria | snake_to_sentence_case }}
+                    {% endif %}
                 </option>
             {% endfor %}
         </select>
