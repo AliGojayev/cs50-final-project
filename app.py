@@ -53,7 +53,7 @@ def index():
     user_id = session["user_id"]
 
     all_movies = db.execute(
-        f"SELECT id, title FROM movies ORDER BY {sort_criteria} {sort_order};"
+        f"SELECT id, title, release_year FROM movies ORDER BY {sort_criteria} {sort_order};"
     )
 
     # TODO: Optimize query
