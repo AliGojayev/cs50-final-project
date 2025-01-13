@@ -5,46 +5,47 @@
 {% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1 class="mb-4">All Movies</h1>
 
-    <form action="/" method="post" class="d-flex justify-content-center mb-4">
-        <select class="form-select mx-auto w-auto" name="sort-criteria">
-            <option disabled="" selected="">Criteria</option>
-            {% for criteria in criterias %}
-                {% if criteria == "title" %}
-                    <option value="title" selected="selected">Alphabetically</option>
-                {% else %}
-                    <option value="{{ criteria }}">
-                        {{ criteria | snake_to_sentence_case }}
-                    </option>
-                {% endif %}
-            {% endfor %}
-        </select>
-        <select class="form-select mx-auto w-auto" name="sort-order">
-            <option value="ASC" selected="selected">Ascending</option>
-            <option value="DESC">Descending</option>
-        </select>
-        <button class="btn btn-warning ms-2" type="submit">Sort</button>
-    </form>
+    <div class="container mt-4">
+        <h1 class="mb-4">All Movies</h1>
 
-    <ul class="list-group">
-        {% for movie in all_movies %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} <span class="text-secondary">({{ movie.release_year }})</span></a>
-                    {% if movie.id not in watched_movie_ids %}
-                        <span class="badge bg-warning text-dark ms-2">Not watched yet</span>
+        <form action="/" method="post" class="d-flex justify-content-start align-items-center mb-4">
+            <select class="form-select me-2 w-auto" name="sort-criteria">
+                <option disabled selected>Criteria</option>
+                {% for criteria in criterias %}
+                    {% if criteria == "title" %}
+                        <option value="title" selected>Alphabetically</option>
+                    {% else %}
+                        <option value="{{ criteria }}">
+                            {{ criteria | snake_to_sentence_case }}
+                        </option>
                     {% endif %}
-                </div>
-                {% if movie.id not in watched_movie_ids %}
-                    <form method="POST" action="/mark-watched" class="d-inline">
-                        <input type="hidden" name="movie_id" value="{{ movie.id }}">
-                        <button type="submit" class="btn btn-sm btn-secondary">Mark as Watched</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-</div>
+                {% endfor %}
+            </select>
+            <select class="form-select me-2 w-auto" name="sort-order">
+                <option value="ASC" selected>Ascending</option>
+                <option value="DESC">Descending</option>
+            </select>
+            <button class="btn btn-warning" type="submit">Sort</button>
+        </form>
+
+        <ul class="list-group">
+            {% for movie in all_movies %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} <span class="text-secondary">({{ movie.release_year }})</span></a>
+                        {% if movie.id not in watched_movie_ids %}
+                            <span class="badge bg-warning text-dark ms-2">Not watched yet</span>
+                        {% endif %}
+                    </div>
+                    {% if movie.id not in watched_movie_ids %}
+                        <form method="POST" action="/mark-watched" class="d-inline">
+                            <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                            <button type="submit" class="btn btn-sm btn-secondary">Mark as Watched</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
