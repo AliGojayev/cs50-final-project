@@ -28,7 +28,7 @@
         {% for movie in all_movies %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }}</a>
+                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }}({{ movie.release_year }})</a>
                     {% if movie.id not in watched_movie_ids %}
                         <span class="badge bg-warning text-dark ms-2">Not watched yet</span>
                     {% endif %}

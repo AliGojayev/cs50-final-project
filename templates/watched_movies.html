@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Watched Movies
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Watched Movies</h1>
+
+    {% if watched_movies %}
+        <ul class="list-group">
+            {% for movie in watched_movies %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} ({{ movie.release_year }})</a>
+                        {% if movie.rating %}
+                            <span class="badge 
+                                {% if movie.rating <= 5 %}bg-danger text-light
+                                {% else %}bg-success text-light
+                                {% endif %} ms-2">★ {{ movie.rating }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary text-light ms-2">Not Rated</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <form method="POST" action="/rate-movie" class="d-inline me-2">
+                            <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                            <select class="form-select form-select-sm d-inline w-auto" name="rating" onchange="this.form.submit()">
+                                <option disabled selected>Rate</option>
+                                {% for i in range(1, 11) %}
+                                    <option value="{{ i }}" {% if movie.rating == i %}selected{% endif %}>★ {{ i }}</option>
+                                {% endfor %}
+                                <option value="remove-rating">Remove</option>
+                            </select>
+                        </form>
+                        <form method="POST" action="/mark-unwatched" class="d-inline">
+                            <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Unwatch</button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-center text-muted">You haven't watched any movies yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
