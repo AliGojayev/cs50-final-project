@@ -13,9 +13,9 @@
             {% for movie in watched_movies %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} ({{ movie.release_year }})</a>
+                        <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} <span class="text-secondary">({{ movie.release_year }})</span></a>
                         {% if movie.rating %}
-                            <span class="badge 
+                            <span class="badge
                                 {% if movie.rating <= 5 %}bg-danger text-light
                                 {% else %}bg-success text-light
                                 {% endif %} ms-2">★ {{ movie.rating }}</span>

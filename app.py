@@ -87,7 +87,7 @@ def watched_movies():
 
     watched_movies = db.execute(
         """
-        SELECT m.id, m.title, wm.rating
+        SELECT m.id, m.title, m.release_year, wm.rating
           FROM movies m
           JOIN watched_movies wm ON m.id = wm.movie_id
          WHERE wm.user_id = ?;
