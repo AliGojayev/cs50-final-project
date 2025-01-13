@@ -33,7 +33,9 @@ app.jinja_env.filters["snake_to_sentence_case"] = snake_to_sentence_case
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    criterias = get_table_columns(db, "movies")
+    criterias = get_table_columns(
+        db, "movies", ["id", "genre", "mood", "description", "image_path"]
+    )
 
     if request.method == "POST":
         sort_criteria = request.form.get("sort-criteria")
@@ -53,7 +55,7 @@ def index():
     user_id = session["user_id"]
 
     all_movies = db.execute(
-        f"SELECT id, title FROM movies ORDER BY {sort_criteria} {sort_order};"
+        f"SELECT id, title, release_year FROM movies ORDER BY {sort_criteria} {sort_order};"
     )
 
     # TODO: Optimize query
@@ -184,7 +186,7 @@ def rate_movie():
 
 @app.route("/movies/", methods=["GET", "POST"])
 def movies():
-    criterias = get_table_columns(db, "movies")
+    criterias = get_table_columns(db, "movies", ["id", "image_path"])
 
     if request.method == "GET":
         return render_template("movies.html", criterias=criterias)

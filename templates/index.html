@@ -12,9 +12,13 @@
         <select class="form-select mx-auto w-auto" name="sort-criteria">
             <option disabled="" selected="">Criteria</option>
             {% for criteria in criterias %}
-                <option value={{ criteria }} {% if criteria == "title" %} selected="selected" {% endif %}>
-                    {{ criteria | snake_to_sentence_case }}
-                </option>
+                {% if criteria == "title" %}
+                    <option value="title" selected="selected">Alphabetically</option>
+                {% else %}
+                    <option value="{{ criteria }}">
+                        {{ criteria | snake_to_sentence_case }}
+                    </option>
+                {% endif %}
             {% endfor %}
         </select>
         <select class="form-select mx-auto w-auto" name="sort-order">
@@ -28,7 +32,7 @@
         {% for movie in all_movies %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }}({{ movie.release_year }})</a>
+                    <a href="/movie/{{ movie.id }}" class="text-decoration-none text-dark movie-title">{{ movie.title }} <span class="text-secondary">({{ movie.release_year }})</span></a>
                     {% if movie.id not in watched_movie_ids %}
                         <span class="badge bg-warning text-dark ms-2">Not watched yet</span>
                     {% endif %}
