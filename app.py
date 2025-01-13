@@ -93,7 +93,7 @@ def watched_movies():
         user_id,
     )
 
-    return render_template("watched-movies.html", watched_movies=watched_movies)
+    return render_template("watched_movies.html", watched_movies=watched_movies)
 
 
 @app.route("/mark-watched", methods=["POST"])
@@ -118,7 +118,7 @@ def mark_watched():
             flash("Error marking movie as watched", "error")
             print(e)
 
-    return redirect("/")
+    return redirect("/watched")
 
 
 @app.route("/mark-unwatched", methods=["POST"])
@@ -139,7 +139,7 @@ def mark_unwatched():
             flash("Error marking movie as watched", "error")
             print(e)
 
-    return redirect("/watched")
+    return redirect("/")
 
 
 @app.route("/rate-movie", methods=["POST"])
@@ -179,7 +179,7 @@ def rate_movie():
             flash("Error rating movie", "error")
             print(e)
 
-    return redirect("/")
+    return redirect("/watched")
 
 
 @app.route("/movies/", methods=["GET", "POST"])
