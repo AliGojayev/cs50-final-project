@@ -12,13 +12,13 @@
         <select class="form-select mx-auto w-auto" name="sort-criteria">
             <option disabled="" selected="">Criteria</option>
             {% for criteria in criterias %}
-                <option value={{ criteria }} {% if criteria == "title" %} selected="selected" {% endif %}>
-                    {% if criteria == "title" %}
-                        Alphabetically
-                    {% else %}
+                {% if criteria == "title" %}
+                    <option value="title" selected="selected">Alphabetically</option>
+                {% else %}
+                    <option value="{{ criteria }}">
                         {{ criteria | snake_to_sentence_case }}
-                    {% endif %}
-                </option>
+                    </option>
+                {% endif %}
             {% endfor %}
         </select>
         <select class="form-select mx-auto w-auto" name="sort-order">
