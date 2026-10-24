@@ -232,8 +232,5 @@ To handle all application functionality, FilmTrckr uses 3 tables in SQLite datab
 
 ## Separation of duties
 
-The work with front-end of the program was almost completely on Ali Gojayev
-Initiating the repository, the code and the program itself was made by Said Gulmetov
-Such functions as index(),watched_movies(),movies(),movie(movie_id),register(),login(),logout() were made by Said Gulmetov
-The remaining functions were made by Ali Gojayev
-The work with the databases was completely on Said Gulmetov```
+Ali Gojayev primarily handled the frontend. Ali Gojayev and Said Gulmetov both contributed to the Python backend and database work. Said Gulmetov initiated the repository.
+
